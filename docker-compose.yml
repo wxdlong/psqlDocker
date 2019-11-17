@@ -1,0 +1,36 @@
+version: '2.0'
+services:
+
+  master:
+    build: 
+      context: .
+      args:
+      - MASTER=true
+    image: pgcluster:9.6.9
+    container_name: pgmaster
+    hostname: pgmaster
+    privileged: true
+    tty: true
+    environment:
+     - pg_type=master
+    env_file:
+      - pg.env
+    ports:
+      - "5432"
+  slave:
+    build: 
+      context: .
+      args:
+      - MASTER=false
+    image: pgcluster:9.6.9
+    container_name: pgslave
+    hostname: pgslave
+    privileged: true
+    depends_on:
+      - master
+    environment:
+      - pg_type=slave
+    env_file:
+      - pg.env
+    ports:
+      - "5432"
