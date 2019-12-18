@@ -2,6 +2,12 @@
 全自动配置主从replication模式postgres  
 
 docker-compose up -d
+```bash
+wxd@long:~/Code/github$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                     NAMES
+7f75e44e0be2        pgcluster:9.6.9     "docker-entrypoint.sh"   18 minutes ago      Up 18 minutes       0.0.0.0:32771->5432/tcp   pgslave
+14abdfa31875        pgcluster:9.6.9     "docker-entrypoint.sh"   18 minutes ago      Up 18 minutes       0.0.0.0:32770->5432/tcp   pgmaster
+```
 
 # 配置主从postgres
 ## 配置`pg_hba.conf`
