@@ -8,12 +8,12 @@ echo "MASTER: ${MASTER}"
 
 if [ ${pg_type} == "master" ]; then
 	{
-		su - postgres -c "/usr/pgsql-9.6/bin/initdb -E UTF-8 --locale=en_US.UTF-8  -D ${PGDATA} -U postgres --pwfile=${PG_PASS}" | tee -a ${PGLOG}
+		su - postgres -c "/usr/pgsql-12/bin/initdb -E UTF-8 --locale=en_US.UTF-8  -D ${PGDATA} -U postgres --pwfile=${PG_PASS}" | tee -a ${PGLOG}
 		echo "initdb postgres " | tee -a ${PGLOG}
 		echo "host    replication     ${PASSWORD}        samenet            md5" >>${PGDATA}/pg_hba.conf
 		echo "host    all             all             samenet            md5" >>${PGDATA}/pg_hba.conf
 		cp -rf /home/initdb/postgresql.conf ${PGDATA}
-		su - postgres -c "/usr/pgsql-9.6/bin/pg_ctl -D ${PGDATA} start >/dev/null "
+		su - postgres -c "/usr/pgsql-12/bin/pg_ctl -D ${PGDATA} start >/dev/null "
 		echo "pg_ctl start" | tee -a ${PGLOG}
 		while [ $(ss -atnp | grep :5432 | grep -q postgres || echo true) ]; do
 			echo "waiting postgres start " | tee -a ${PGLOG}
@@ -27,7 +27,6 @@ if [ ${pg_type} == "master" ]; then
 		echo "recovery_target_timeline = 'latest'" >>${PGDATA}/recovery.done
 		echo "trigger_file = '/var/lib/pgsql/master' " >>${PGDATA}/recovery.done
 		echo "restore_command = 'cp /var/lib/pgsql/9.6/backups/%f %p' " >>${PGDATA}/recovery.done
-		echo "archive_cleanup_command = '/usr/pgsql-9.6/bin/pg_archivecleanup -d /var/lib/pgsql/9.6/backups/ %r >> /var/lib/pgsql/cleanup.log' " >>${PGDATA}/recovery.done
 		chmod 0644 ${PGDATA}/recovery.done
 		chown postgres:postgres ${PGDATA}/recovery.done
 
@@ -59,13 +58,10 @@ else {
 		fi
 		sleep 2
 	done
-	su - postgres -c " /usr/pgsql-9.6/bin/pg_basebackup -h pgmaster -U replic -D ${PGDATA} -X stream -P -R" >> ${PGLOG}
-	echo "pg_basebackup postgres " | tee -a ${PGLOG}
-	echo "recovery_target_timeline = 'latest'" >>${PGDATA}/recovery.conf
-	echo "trigger_file = '/var/lib/pgsql/master'" >>${PGDATA}/recovery.conf
-	echo "restore_command = 'cp /var/lib/pgsql/9.6/backups/%f %p' " >>${PGDATA}/recovery.conf
-	echo "archive_cleanup_command = '/usr/pgsql-9.6/bin/pg_archivecleanup -d /var/lib/pgsql/9.6/backups/ %r >> /var/lib/pgsql/cleanup.log' " >>${PGDATA}/recovery.conf
-	su - postgres -c "/usr/pgsql-9.6/bin/pg_ctl -D ${PGDATA} start"
+	su - postgres -c " /usr/pgsql-12/bin/pg_basebackup -h pgmaster -U replic -D ${PGDATA} -X stream -P -R" >> ${PGLOG}
+    su - postgres -c "touch  ${PGDATA}/standby.signal"
+
+	su - postgres -c "/usr/pgsql-12/bin/pg_ctl -D ${PGDATA} start"
 	echo "pg_ctl start" | tee -a ${PGLOG}
 }
 

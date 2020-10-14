@@ -6,7 +6,7 @@ services:
       context: .
       args:
       - MASTER=true
-    image: pgcluster:9.6.9
+    image: pgcluster:12
     container_name: pgmaster
     hostname: pgmaster
     privileged: true
@@ -22,7 +22,7 @@ services:
       context: .
       args:
       - MASTER=false
-    image: pgcluster:9.6.9
+    image: pgcluster:12
     container_name: pgslave
     hostname: pgslave
     privileged: true

@@ -12,8 +12,8 @@ ENV PATH ${PG_HOME}/bin:$PATH
 
 #install packages
 RUN yum install -y yum-plugin-ovl tar vim iproute \
-    https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm 
-RUN yum install -y postgresql96 postgresql96-server
+    https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+RUN yum install -y postgresql12-server
 
 
 RUN echo "postgres" > ${PG_PASS}; \
