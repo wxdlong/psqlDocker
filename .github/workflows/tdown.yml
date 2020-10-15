@@ -1,0 +1,30 @@
+name: Push psql Docker image
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run a one-line script
+      run: echo Download!
+    - name: Login Docker Push images
+      env:
+        ACCESS_TOKEN: ${{ secrets.DOCKER_PW }} 
+      run: |
+        img=wxdlong/psql:12
+        echo "PWD:${PWD}"
+        docker login -u wxdlong -p ${ACCESS_TOKEN}
+        docker build . --file Dockerfile --tag ${img}
+        echo "push to docker hub"
+        docker push ${img}
+
+        echo "push to aliyun"
+        docker logout
+        docker login registry.cn-hangzhou.aliyuncs.com -u yjmnrg@gmail.com -p ${ACCESS_TOKEN}
+        docker tag ${img} registry.cn-hangzhou.aliyuncs.com/${img}
+        docker push registry.cn-hangzhou.aliyuncs.com/${img}
